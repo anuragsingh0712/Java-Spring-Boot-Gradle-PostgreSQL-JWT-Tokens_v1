@@ -29,7 +29,8 @@ public class NotificationService {
   }
 
   @Transactional
-  public Notification create(User user, String type, String message, ProgressTracker progressTracker) {
+  public Notification create(
+      User user, String type, String message, ProgressTracker progressTracker) {
     Notification notification = new Notification();
     notification.setUser(user);
     notification.setType(type);
