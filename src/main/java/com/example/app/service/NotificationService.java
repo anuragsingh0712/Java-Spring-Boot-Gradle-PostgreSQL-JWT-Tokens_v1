@@ -1,6 +1,8 @@
 package com.example.app.service;
 
+import com.example.app.dto.NotificationRequest;
 import com.example.app.entity.Notification;
+import com.example.app.entity.ProgressTracker;
 import com.example.app.entity.User;
 import com.example.app.exception.ResourceNotFoundException;
 import com.example.app.repository.NotificationRepository;
@@ -19,13 +21,21 @@ public class NotificationService {
 
   private final SimpMessagingTemplate messagingTemplate;
 
+  private final ProgressTrackerService progressTrackerService;
+
   @Transactional
   public Notification create(User user, String type, String message) {
+    return create(user, type, message, null);
+  }
+
+  @Transactional
+  public Notification create(User user, String type, String message, ProgressTracker progressTracker) {
     Notification notification = new Notification();
     notification.setUser(user);
     notification.setType(type);
     notification.setMessage(message);
     notification.setRead(false);
+    notification.setProgressTracker(progressTracker);
     Notification saved = notificationRepository.save(notification);
     try {
       messagingTemplate.convertAndSend("/topic/notifications/" + user.getId(), saved);
@@ -33,6 +43,15 @@ public class NotificationService {
       // websocket broadcast is best-effort and must not break the main flow
     }
     return saved;
+  }
+
+  @Transactional
+  public Notification createForUser(User user, NotificationRequest request) {
+    ProgressTracker progressTracker = null;
+    if (request.getProgressTrackerId() != null) {
+      progressTracker = progressTrackerService.findById(request.getProgressTrackerId());
+    }
+    return create(user, request.getType(), request.getMessage(), progressTracker);
   }
 
   public Page<Notification> findByUser(Long userId, Pageable pageable) {

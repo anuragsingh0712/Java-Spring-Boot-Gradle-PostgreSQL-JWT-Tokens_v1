@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,32 +17,33 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "notifications")
+@Table(name = "progress_trackers")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Notification {
+public class ProgressTracker {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+  @JoinColumn(name = "member_id", nullable = false)
+  private Member member;
 
   @Column(nullable = false)
-  private String type;
+  private String title;
 
-  @Column(nullable = false, columnDefinition = "TEXT")
-  private String message;
+  @Column(columnDefinition = "TEXT")
+  private String description;
 
   @Column(nullable = false)
-  private boolean isRead = false;
+  private Integer progressPercentage;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "progress_tracker_id")
-  private ProgressTracker progressTracker;
+  @Column(nullable = false)
+  private String status = "IN_PROGRESS";
+
+  private LocalDate recordedAt;
 
   @CreationTimestamp
   @Column(nullable = false, updatable = false)

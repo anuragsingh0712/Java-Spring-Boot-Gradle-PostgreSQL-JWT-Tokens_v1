@@ -24,13 +24,13 @@ services:
     container_name: gym_app
     restart: unless-stopped
     environment:
-      SERVER_PORT: 26787
+      SERVER_PORT: 20383
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/gen_2a2cfb7448c2
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: mypassword
       JWT_SECRET: c2VjdXJlLWRlZmF1bHQtand0LXNlY3JldC1rZXktZm9yLWd5bS1tYW5hZ2VtZW50LWFwcC1jaGFuZ2UtaW4tcHJvZHVjdGlvbg==
     ports:
-      - "26787:26787"
+      - "20383:20383"
     depends_on:
       db:
         condition: service_healthy

@@ -75,9 +75,15 @@ INSERT INTO payments (id, member_id, membership_id, amount, status, method, tran
     (1, 1, 1, 49.99, 'SUCCESS', 'CARD', '2024-06-01 09:00:00', now())
 ON CONFLICT (id) DO NOTHING;
 
+-- Progress Trackers
+INSERT INTO progress_trackers (id, member_id, title, description, progress_percentage, status, recorded_at, created_at) VALUES
+    (1, 1, 'Weight Loss Goal', 'Target: lose 5kg over 3 months', 40, 'IN_PROGRESS', '2024-06-15', now())
+ON CONFLICT (id) DO NOTHING;
+
 -- Notifications
-INSERT INTO notifications (id, user_id, type, message, is_read, created_at) VALUES
-    (1, 6, 'MEMBERSHIP_ACTIVATED', 'Your membership plan Gold Plan has been activated.', false, now())
+INSERT INTO notifications (id, user_id, type, message, is_read, progress_tracker_id, created_at) VALUES
+    (1, 6, 'MEMBERSHIP_ACTIVATED', 'Your membership plan Gold Plan has been activated.', false, NULL, now()),
+    (2, 6, 'PROGRESS_UPDATE', 'Your weight loss goal is now 40% complete.', false, 1, now())
 ON CONFLICT (id) DO NOTHING;
 
 -- Re-align identity sequences with the highest seeded id so future inserts do not collide
@@ -93,4 +99,5 @@ SELECT setval(pg_get_serial_sequence('class_registrations', 'id'), (SELECT COALE
 SELECT setval(pg_get_serial_sequence('appointments', 'id'), (SELECT COALESCE(MAX(id), 1) FROM appointments));
 SELECT setval(pg_get_serial_sequence('attendances', 'id'), (SELECT COALESCE(MAX(id), 1) FROM attendances));
 SELECT setval(pg_get_serial_sequence('payments', 'id'), (SELECT COALESCE(MAX(id), 1) FROM payments));
+SELECT setval(pg_get_serial_sequence('progress_trackers', 'id'), (SELECT COALESCE(MAX(id), 1) FROM progress_trackers));
 SELECT setval(pg_get_serial_sequence('notifications', 'id'), (SELECT COALESCE(MAX(id), 1) FROM notifications));

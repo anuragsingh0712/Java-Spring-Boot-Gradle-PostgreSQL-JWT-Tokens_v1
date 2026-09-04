@@ -10,7 +10,7 @@ package:
 	./gradlew bootJar -q
 
 run: package
-	SERVER_PORT=$${SERVER_PORT:-26787} bash start.sh
+	SERVER_PORT=$${SERVER_PORT:-20383} bash start.sh
 
 clean:
 	./gradlew clean -q

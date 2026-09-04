@@ -1,19 +1,25 @@
 package com.example.app.controller;
 
+import com.example.app.dto.NotificationRequest;
 import com.example.app.entity.Notification;
 import com.example.app.security.SecurityUtils;
 import com.example.app.service.NotificationService;
+import com.example.app.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,12 +34,26 @@ public class NotificationController {
 
   private final NotificationService notificationService;
 
+  private final UserService userService;
+
   @GetMapping
   @Operation(summary = "List the current user's notifications (paginated)")
   public ResponseEntity<Page<Notification>> findMine(
       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
     Long userId = SecurityUtils.getCurrentUserId();
     return ResponseEntity.ok(notificationService.findByUser(userId, PageRequest.of(page, size)));
+  }
+
+  @PostMapping
+  @Operation(
+      summary =
+          "Add a notification for the current user, optionally linked to a progress tracker"
+              + " entry")
+  public ResponseEntity<Notification> create(@Valid @RequestBody NotificationRequest request) {
+    Long userId = SecurityUtils.getCurrentUserId();
+    Notification notification =
+        notificationService.createForUser(userService.getEntity(userId), request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(notification);
   }
 
   @GetMapping("/{id}")
